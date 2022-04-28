@@ -230,4 +230,96 @@ Q count the number of customers who are from Chennai and had done the transactio
    FROM customer c JOIN purchase p
    ON c.custid=p.custid
    WHERE city='Chennai'
- 
+ -------------------------------------------------------------------------------------------------------------------
+CREATE TABLE employee1(
+    id INTEGER CONSTRAINT employee_id_pk PRIMARY KEY,
+    ename VARCHAR2(20) NOT NULL,
+    manager INTEGER CONSTRAINT employee_manager_fk REFERENCES employee(id)
+  )
+
+   INSERT INTO employee1 VALUES(1,'Ashok',null);
+   INSERT INTO employee VALUES(2,'Randhir',10);   /* Error while inserting the record as we dont have the id as 10 in the employee table */
+  INSERT INTO employee1 VALUES(2,'Randhir',1);
+  INSERT INTO employee1 VALUES(3,'Sunita',1);
+  INSERT INTO employee1 VALUES(4,'Reghav',2);
+
+---------------------------------------------------------------------------------------------------------------
+SELECT * FROM employee1;
+
+SELECT emp.id employee_id, emp.ename employee_name, mgr.id manager_id, mgr.ename managers_name
+FROM employee1 emp INNER JOIN employee1 mgr
+ON emp.manager=mgr.id
+
+--------------------------
+Subqueries
+Display the id,ename and salary for the employee who is getting the maximum salary.
+1) Display id,ename and salary.
+   SELECT id,ename,salary
+   FROM employee
+2) display the maximum salary.
+   SELECT max(salary)
+   FROM employee
+
+   SELECT id,ename,salary
+   FROM employee
+   WHERE salary=(SELECT max(salary) FROM employee)
+
+
+-------------------------------------------------------------
+Display the department which is investing highest sum of salary.
+
+E0001  Rajesh  Sales   10000
+E0002  Sumit   Mkt     15000
+E0003  Sunita  Sales   10000
+E0004  Neetu   Mkt     15000
+
+     Mkt    30000
+     Sales  20000
+
+1) Display departmentwise salary total
+   SELECT dept,sum(salary)
+   FROM employee
+   GROUP BY dept
+
+
+2) Display the maximum salary total
+   select max(sum(salary))
+   FROM employee
+   GROUP BY dept
+
+
+   SELECT dept
+   FROM employee
+   GROUP BY dept
+   HAVING sum(salary)=(select max(sum(salary))
+   FROM employee
+   GROUP BY dept)
+-------------------------------------------------
+ANSI and THETA style
+
+
+ANSI
+SELECT C.CompId, Make, Model
+FROM Computer C JOIN Employee E 
+ON E.CompId = C.CompId;
+
+
+
+THETA style
+SELECT C.CompId, Make, Model
+FROM Computer C, Employee E 
+WHERE E.CompId = C.CompId;
+
+
+--------------------------------------------------------------------------------------------------------
+Display employeeid employeename, computer model  being assigned to employee
+
+Display compid,model being assigned to employee
+
+SELECT compid,model FROM computer where compid IN ( SELECT compid from employee)
+----------------------------------------------------------------------------------------------
+display the employees whose salary is more than the average salary
+
+ SELECT name
+ FROM employee
+ WHERE salary>(SELECT avg(salary) FROM employee)  
