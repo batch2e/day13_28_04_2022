@@ -1,0 +1,233 @@
+customer
+  custid  should start with C and primary key
+  firstname   not null
+  middlename  can be null
+  lastname    not null
+  city        not null
+  state       not null
+ 
+  CREATE TABLE customer(
+   custid VARCHAR2(5),
+   firstname VARCHAR2(30) NOT NULL,
+   middlename VARCHAR2(30),
+   lastname VARCHAR2(30) NOT NULL,
+   city VARCHAR2(30) NOT NULL,
+   state VARCHAR2(30) NOT NULL,
+   CONSTRAINT customer_custid_pk PRIMARY KEY(custid),
+   CONSTRAINT customer_custid_chk CHECK ( custid LIKE 'C%')
+  )
+
+
+  INSERT INTO customer VALUES('C0001','Suresh',NULL,'Chandra','Chennai','TN');
+  INSERT INTO customer VALUES('C0002','Ravish','Kumar','Gupta','Patna','Bihar');
+  INSERT INTO customer VALUES('C0003','Nitin',null,'Kumar','Gaya','Bihar');
+  INSERT INTO customer VALUES('C0004','Arnab','Kumar','Dutta','Kolkata','WB');
+  INSERT INTO customer VALUES('C0005','Jullie',null,'Desouza','Coimbatore','TN');
+  INSERT INTO customer VALUES('C0006','Sangeet',null,'Madhavan','Chennai','TN');
+  INSERT INTO customer VALUES('C0007','Dhiman',null,'Ganguly','Durgapur','WB');
+  INSERT INTO customer VALUES('C0008','Natasha',null,'Daniel','Salem','TN');
+  INSERT INTO customer VALUES('C0009','Asha','Rani','Gupta','Patna','Bihar');
+  INSERT INTO customer VALUES('C0010','Mani','Kant','Sharma','Muzzafarpur','Bihar');
+Q . Display firstname,middlename for all the customers.
+Q . Display firstname for the customers from Tamilnadu.
+Q . Display firstname for the customers who are not from Tamilnadu.
+Q . Display the firstname,lastname for the customers who are not from Tamilnadu and West Bengal.
+Q. Count the number of customers from Bihar. Give the alias name as Count of customer.
+Q. Count the number of customers statewise.
+Q. Count the number of customers statewise and citywise.
+Q. Display the state from which we have maximum number of customers.
+Q. Display the firstname of the customer who are having middlename as NULL.
+Q. Display the first where name starts with A and followed by tha we have only 3 characters.
+Q. Count the number of customers who don't have middlename.
+Q. Display the state which is having the maximum number of customers.
+Q. Display the state which is having the maximum number of customer and minimum number of customers.
+
+
+
+  
+item
+  itemid should start with I and primary key
+  desc       not null
+  price      >0
+  qoh        >0
+  category   cosmetics,stationery,garments
+  
+ CREATE TABLE item(
+   itemid VARCHAR2(5),
+   description VARCHAR2(20) NOT NULL,
+   price INTEGER,
+   qoh INTEGER,
+   category VARCHAR2(20),
+   CONSTRAINT item_itemid_pk PRIMARY KEY(itemid),
+   CONSTRAINT item_price_chk CHECK ( price>0),
+   CONSTRAINT item_qoh_chk CHECK (qoh>0),
+   CONSTRAINT item_category_chk CHECK (category IN('Cosmetics','Stationery','Garments'))
+   )
+
+
+  INSERT INTO item VALUES('I0001','Pen',20.45,100,'Stationery');
+  INSERT INTO item VALUES('I0002','Pencil',5.50,200,'Stationery');
+  INSERT INTO item VALUES('I0003','Eraser',2.30,230,'Stationery');
+  INSERT INTO item VALUES('I0004','Shirt',1000,400,'Garments');
+  INSERT INTO item VALUES('I0005','T-Shirt',900,400,'Garments');
+  INSERT INTO item VALUES('I0006','Perfume',600,400,'Cosmetics');
+  INSERT INTO item VALUES('I0007','Kajal Pencil',15.56,200,'Cosmetics');
+
+Q. Display the itemname which is having maximum price.
+Q. Count the number of items categorywise.
+Q. Display the category where the investement is highest.
+Q. Display the item which is never purchased by any customer.
+Q. Display the item which is transacted multiple times. 
+
+purchase 
+  tranid should start with T and primary key
+  itemid FK
+  custid FK 
+  dop  default sysdate
+  qtypur    >0
+
+
+  CREATE TABLE purchase(
+    tranid VARCHAR2(5),
+    itemid VARCHAR2(5),
+    custid VARCHAR2(5),
+    dop DATE DEFAULT sysdate,
+    qtypur INTEGER,
+    CONSTRAINT purchase_tranid_pk PRIMARY KEY(tranid),
+    CONSTRAINT purchase_tranid_chk CHECK ( tranid LIKE 'T%'),
+    CONSTRAINT purchase_itemid_fk FOREIGN KEY(itemid) REFERENCES item(itemid),
+    CONSTRAINT purchase_custid_fk FOREIGN KEY(custid) REFERENCES customer(custid),
+    CONSTRAINT purchase_qtypur_chk CHECK (qtypur>0)  
+
+  )
+
+  INSERT INTO purchase VALUES('T0001','I0001','C0003','12-Jul-2010',20);
+  INSERT INTO purchase VALUES('T0002','I0001','C0001','15-Aug-2015',20);
+  INSERT INTO purchase VALUES('T0003','I0003','C0004','23-Jan-2020',30);
+  INSERT INTO purchase VALUES('T0004','I0002','C0006','01-Feb-2016',10);
+  INSERT INTO purchase VALUES('T0005','I0004','C0006','01-Feb-2016',10);
+  INSERT INTO purchase VALUES('T0006','I0004','C0006','02-Jun-2020',30);
+
+Q display the itemid,itemname for the items which were transacted in the month of February.
+Q Display the itemid,itemname which were transacted between the year 2015 and 2020.(Inclusive)
+Q Count the number of items transacted in the month of February.
+Q Display the customer name whose transaction is most.
+Q display itemid,itemname,customerid, customername and dop. Sort on date. 
+Q display the customer name who purchased the item on today's date.
+-----------------------------------------------------------------------------------------------------------
+
+Q  Display customerid, firstname, dop. 
+
+A SELECT cust.custid,firstname,dop
+FROM customer cust INNER JOIN purchase pur
+ON cust.custid=pur.custid
+
+A SELECT customer.custid,firstname,dop
+FROM customer  INNER JOIN purchase 
+ON customer.custid=purchase.custid
+
+
+Q Display customerid,firstname,lastname,dop for customer C0001.
+
+A SELECT c.custid,firstname,lastname
+  FROM customer c JOIN purchase p
+  ON c.custid=p.custid
+  WHERE custid='C0001'
+
+
+Q Display customer's id,firstname,lastname, itemid, itemname and dop.
+
+
+SELECT c.custid,firstname,lastname,i.itemid,itemname,dop
+FROM customer c JOIN purchase p
+ON c.custid=p.custid
+JOIN item i
+ON i.itemid=p.itemid
+
+----------------------------------------------------------------------------------------------------------------------
+Q Display firstname and number of items purchased by the customer.
+
+*count
+* join customer and purchase
+* group by
+
+SELECT firstname,count(tranid)
+FROM customer c JOIN purchase p
+ON c.custid=p.custid
+GROUP BY firstname
+
+
+Q Display firstname and number of items purchased by different customers from Kolkata.
+
+SELECT firstname,count(tranid)
+FROM customer c JOIN purchase p
+ON c.custid=p.custid
+WHERE city='Kolkata'
+GROUP BY firstname
+
+Q   Display firstname and number of items purchased by different customers from Kolkata where the purchase is more than 10 items.
+
+SELECT firstname,count(tranid)
+FROM customer c JOIN purchase p
+ON c.custid=p.custid
+WHERE city='Kolkata'
+GROUP BY firstname
+HAVING count(tranid)>10
+
+Q   Display firstname and number of items purchased by different customers from Kolkata where the purchase is more than 10 items
+    sorted on firstname
+
+SELECT firstname,count(tranid)
+FROM customer c JOIN purchase p
+ON c.custid=p.custid
+WHERE city='Kolkata'
+GROUP BY firstname
+HAVING count(tranid)>10
+ORDER BY firstname
+
+Q   Display firstname and number of items purchased by different customers from Kolkata where the purchase is more than 10 items
+    sorted on number of items purchased.
+
+SELECT firstname,count(tranid) count_of_items
+FROM customer c JOIN purchase p
+ON c.custid=p.custid
+WHERE city='Kolkata'
+GROUP BY firstname
+HAVING count(tranid)>10
+ORDER BY count_of_items
+
+
+Q display firstname,itemname and number of items purchased by different customers from Kolkata where the purchase is more than 10 items sorted on number of items purchased in descending order.
+
+SELECT firstname,description,count(tranid) count_of_items
+FROM customer c JOIN purchase p
+ON c.custid=p.custid
+JOIN item i
+ON i.itemid=p.itemid
+WHERE city='Kolkata'
+GROUP BY firstname,description
+HAVING count(tranid)>10
+ORDER BY count_of_items DESC
+
+
+Q display firstname,itemname and number of items purchased by different customers from Kolkata in the month of July where the purchase is more than 10 items sorted on number of items purchased in descending order.
+
+
+SELECT firstname,description,count(tranid) count_of_items
+FROM customer c JOIN purchase p
+ON c.custid=p.custid
+JOIN item i
+ON i.itemid=p.itemid
+WHERE city='Kolkata' AND to_char(dop,'month')='july'
+GROUP BY firstname,description
+HAVING count(tranid)>10
+ORDER BY count_of_items DESC
+
+
+
+Q count the number of customers who are from Chennai and had done the transactions.
+   SELECT count(tranid)
+   FROM customer c JOIN purchase p
+   ON c.custid=p.custid
+   WHERE city='Chennai'
+ 
